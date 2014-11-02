@@ -4,4 +4,6 @@
 #include "face_ios.h"
 int main(int argc, char *argv[]);
 
+#define MAX_CONNECTIONS 32
+
 #endif
