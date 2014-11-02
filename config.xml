@@ -1,0 +1,61 @@
+<connection_list>
+<!-- Connection 1 -->
+<!-- Destination is IO Seg - Address is io.  Change to what you need -->
+<connection>
+<name>A429_TX_DATALOGGER</name>
+<type>UDP</type>
+<direction>TRANSMIT</direction>
+<refreshperiod>1000000000</refreshperiod>
+<sourceaddress></sourceaddress>
+<destinationaddress>137.104.21.4</destinationaddress>
+<sourceport></sourceport>
+<destinationport>7080</destinationport>
+<iotype>A429</iotype>
+<channel>1</channel>
+<a429_parity>ODD</a429_parity>
+<a429_speed>HIGH</a429_speed>
+</connection>
+<!-- Connection 2 -->
+<!-- Destination is PSS - Address is clifton's.  Change to what you need -->
+<connection>
+<name>A429_RX_IGS</name>
+<type>UDP</type>
+<direction>RECEIVE</direction>
+<refreshperiod>1000000000</refreshperiod>
+<sourceaddress></sourceaddress>
+<destinationaddress>137.104.120.21</destinationaddress>
+<sourceport></sourceport>
+<destinationport>7081</destinationport>
+<iotype>A429</iotype>
+<channel>3</channel>
+<a429_parity>ODD</a429_parity>
+<a429_speed>HIGH</a429_speed>
+</connection>
+<!-- Connection 3 -->
+<connection>
+<name>DISCRETE_INPUT_WOW</name>
+<type>Direct API</type>
+<direction>RECEIVE</direction>
+<refreshperiod>1000000000</refreshperiod>
+<sourceaddress></sourceaddress>
+<destinationaddress></destinationaddress>
+<sourceport></sourceport>
+<destinationport></destinationport>
+<iotype>DISCRETE</iotype>
+<channel>1</channel>
+</connection>
+<!-- Connection 4 -->
+<connection>
+<name>DISCRETE_OUTPUT_EMERGENCY</name>
+<type>Direct API</type>
+<direction>TRANSMIT</direction>
+<refreshperiod>1000000000</refreshperiod>
+<sourceaddress></sourceaddress>
+<destinationaddress></destinationaddress>
+<sourceport></sourceport>
+<destinationport></destinationport>
+<iotype>DISCRETE</iotype>
+<channel>17</channel>
+<discrete_inital_value>1</discrete_inital_value>
+</connection>
+</connection_list>
