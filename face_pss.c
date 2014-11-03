@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
    uint32_t numConnections = MAX_CONNECTIONS;
    FACE_CONFIG_DATA_TYPE config[MAX_CONNECTIONS];
 
-   PasrseConfigFile( argv[1], config, &numConnections);
+   PasrseConfigFile(argv[1], config, &numConnections);
 
    // Open channels from config and store handles
    FACE_INTERFACE_HANDLE_TYPE handles[MAX_CONNECTIONS];
@@ -131,4 +131,38 @@ uint8_t readDiscrete(FACE_INTERFACE_HANDLE_TYPE handle, int channel,
    FACE_IO_Read(handle, 0, &msgLen, rxFaceMsg, retCode);
 
    return FaceDiscreteState(rxFaceMsg);
+}
+
+void setArinc429(FACE_INTERFACE_HANDLE_TYPE handle, uint8_t channel, uint32_t data[], int numLabels, FACE_RETURN_CODE_TYPE *retCode)
+{
+   // The message adn stuff we will need
+   char txBuff[MAX_BUFF_SIZE];
+   FACE_IO_MESSAGE_TYPE *txFaceMsg = (FACE_IO_MESSAGE_TYPE*)txBuff;
+
+   // Zero it out
+   memset(txBuff, 0, MAX_BUFF_SIZE);
+
+   // Set the fixed fields
+   txFaceMsg->guid = htonl(100);
+   txFaceMsg->busType = FACE_ARINC_429;
+   txFaceMsg->message_type = htons(FACE_DATA);
+   // The FACE_A429_MESSAGE_TYPE already gives us one label
+   FaceSetPayLoadLength(txFaceMsg, sizeof(FACE_A429_MESSAGE_TYPE) + (4 * (numLabels - 1)));
+
+   // Set up the data
+   FACE_A429_MESSAGE_TYPE *txData = (FACE_A429_MESSAGE_TYPE*)txFaceMsg->data;
+   txData->channel = channel;
+   txData->num_labels = numLabels;
+   int i;
+   for(i = 0; i < numLabels; i++)
+   {
+      txData->data[i] = data[i];
+   }
+
+   // Write it
+   FACE_IO_Write(handle, 0, FACE_MSG_HEADER_SIZE + FacePayLoadLength(txFaceMsg), txFaceMsg, retCode);
+}
+
+uint32_t readArinc429(FACE_INTERFACE_HANDLE_TYPE handle, uint8_t channel, FACE_RETURN_CODE_TYPE *retCode)
+{
 }
