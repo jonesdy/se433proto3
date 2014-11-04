@@ -133,9 +133,10 @@ uint8_t readDiscrete(FACE_INTERFACE_HANDLE_TYPE handle, int channel,
    return FaceDiscreteState(rxFaceMsg);
 }
 
-void setArinc429(FACE_INTERFACE_HANDLE_TYPE handle, uint8_t channel, uint32_t data[], int numLabels, FACE_RETURN_CODE_TYPE *retCode)
+void sendArinc429(FACE_INTERFACE_HANDLE_TYPE handle, uint8_t channel, uint32_t *data, uint32_t numLabels,
+   FACE_RETURN_CODE_TYPE *retCode)
 {
-   // The message adn stuff we will need
+   // The message and stuff we will need
    char txBuff[MAX_BUFF_SIZE];
    FACE_IO_MESSAGE_TYPE *txFaceMsg = (FACE_IO_MESSAGE_TYPE*)txBuff;
 
@@ -147,13 +148,14 @@ void setArinc429(FACE_INTERFACE_HANDLE_TYPE handle, uint8_t channel, uint32_t da
    txFaceMsg->busType = FACE_ARINC_429;
    txFaceMsg->message_type = htons(FACE_DATA);
    // The FACE_A429_MESSAGE_TYPE already gives us one label
+   // TODO: Should this be using FACE_A429_MESSAGE_TYPE instead of 4?
    FaceSetPayLoadLength(txFaceMsg, sizeof(FACE_A429_MESSAGE_TYPE) + (4 * (numLabels - 1)));
 
    // Set up the data
    FACE_A429_MESSAGE_TYPE *txData = (FACE_A429_MESSAGE_TYPE*)txFaceMsg->data;
    txData->channel = channel;
    txData->num_labels = numLabels;
-   int i;
+   uint32_t i;
    for(i = 0; i < numLabels; i++)
    {
       txData->data[i] = data[i];
@@ -163,6 +165,34 @@ void setArinc429(FACE_INTERFACE_HANDLE_TYPE handle, uint8_t channel, uint32_t da
    FACE_IO_Write(handle, 0, FACE_MSG_HEADER_SIZE + FacePayLoadLength(txFaceMsg), txFaceMsg, retCode);
 }
 
-uint32_t readArinc429(FACE_INTERFACE_HANDLE_TYPE handle, uint8_t channel, FACE_RETURN_CODE_TYPE *retCode)
+// Uses numLabels as max number of labels, and then uses it to return how many labels were actually read
+void readArinc429(FACE_INTERFACE_HANDLE_TYPE handle, uint8_t channel, uint32_t *data, uint32_t *numLabels,
+   FACE_RETURN_CODE_TYPE *retCode)
 {
+   // TODO: We don't need channel number?
+   // The message and stuff we will need
+   char rxBuff[MAX_BUFF_SIZE];
+   FACE_IO_MESSAGE_TYPE *rxFaceMsg = (FACE_IO_MESSAGE_TYPE*)rxBuff;
+
+   // Zero it out
+   memset(rxBuff, 0, MAX_BUFF_SIZE);
+
+   // Set the fixed fields
+   rxFaceMsg->guid = htonl(200);
+   rxFaceMsg->busType = FACE_ARINC_429;
+   rxFaceMsg->message_type = htons(FACE_DATA);
+   // TODO: Should this be using FACE_A429_MESSAGE_TYPE instead of 4?
+   FACE_MESSAGE_LENGTH_TYPE messageLength = FACE_MSG_HEADER_SIZE + sizeof(FACE_A429_MESSAGE_TYPE) + (4 * (*numLabels - 1));
+   
+   // Read it
+   FACE_IO_Read(handle, 50000000L, &messageLength, rxFaceMsg, retCode);
+
+   // Return the data
+   FACE_A429_MESSAGE_TYPE *rxData = (FACE_A429_MESSAGE_TYPE*)rxFaceMsg->data;
+   *numLabels = rxData->num_labels;
+   uint32_t i;
+   for(i = 0; i < *numLabels; i++)
+   {
+      data[i] = rxData->data[i];
+   }
 }
