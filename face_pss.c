@@ -142,8 +142,7 @@ void sendArinc429(FACE_INTERFACE_HANDLE_TYPE handle, uint8_t channel, uint32_t *
    txFaceMsg->busType = FACE_ARINC_429;
    txFaceMsg->message_type = htons(FACE_DATA);
    // The FACE_A429_MESSAGE_TYPE already gives us one label
-   // TODO: Should this be using FACE_A429_MESSAGE_TYPE instead of 4?
-   FaceSetPayLoadLength(txFaceMsg, sizeof(FACE_A429_MESSAGE_TYPE) + (4 * (numLabels - 1)));
+   FaceSetPayLoadLength(txFaceMsg, sizeof(FACE_A429_MESSAGE_TYPE) + (sizeof(uint32_t) * (numLabels - 1)));
 
    // Set up the data
    FACE_A429_MESSAGE_TYPE *txData = (FACE_A429_MESSAGE_TYPE*)txFaceMsg->data;
@@ -175,8 +174,8 @@ void readArinc429(FACE_INTERFACE_HANDLE_TYPE handle, uint8_t *channel, uint32_t 
    rxFaceMsg->guid = htonl(200);
    rxFaceMsg->busType = FACE_ARINC_429;
    rxFaceMsg->message_type = htons(FACE_DATA);
-   // TODO: Should this be using FACE_A429_MESSAGE_TYPE instead of 4?
-   FACE_MESSAGE_LENGTH_TYPE messageLength = FACE_MSG_HEADER_SIZE + sizeof(FACE_A429_MESSAGE_TYPE) + (4 * (*numLabels - 1));
+   FACE_MESSAGE_LENGTH_TYPE messageLength = FACE_MSG_HEADER_SIZE + sizeof(FACE_A429_MESSAGE_TYPE) +
+      (sizeof(uint32_t) * (*numLabels - 1));
    
    // Read it
    FACE_IO_Read(handle, 50000000L, &messageLength, rxFaceMsg, retCode);
