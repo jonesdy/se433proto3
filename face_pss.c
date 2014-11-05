@@ -42,8 +42,8 @@ int main(int argc, char *argv[])
 
    // Open channels from config and store handles
    FACE_INTERFACE_HANDLE_TYPE handles[MAX_CONNECTIONS];
-   int i = 0;
-   for(i = 0; i < MAX_CONNECTIONS; i++)
+   uint32_t i = 0;
+   for(i = 0; i < numConnections; i++)
    {
       FACE_IO_Open(config[i].name, &handles[i], &retCode);
       if(retCode != FACE_NO_ERROR)
@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
    repl(handles, config);
 
    // Close channels
-   for(i = 0; i < MAX_CONNECTIONS; i++)
+   for(i = 0; i < numConnections; i++)
    {
       FACE_IO_Close(handles[i], &retCode);
       if(retCode != FACE_NO_ERROR )
