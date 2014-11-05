@@ -10,12 +10,14 @@
 #define GOODMESSAGE "SUCCESS\n"
 #endif
 
-static int gethandle(FACE_CONFIG_DATA_TYPE config[], int channel)
+#define MAX_ARINC_LABELS_PER_MESSAGE 10
+
+static int gethandle(FACE_CONFIG_DATA_TYPE config[], int channel, int/*XXX*/ bustype)
 {
    int i;
    for(i = 0; i < MAX_CONNECTIONS; i++)
    {
-      if(config[i].channel == channel && config[i].busType == FACE_DISCRETE)
+      if(config[i].channel == channel && config[i].busType == bustype)
       {
          return i;//handles[i];
       }
@@ -44,6 +46,9 @@ void repl(FACE_INTERFACE_HANDLE_TYPE handles[], FACE_CONFIG_DATA_TYPE config[])
 			printf("c 5 -- clear discrete 5\n");
 			//printf("z 5 -- high impedance discrete 5\n");
 			printf("r 5 -- read discrete 5\n");
+			printf("w 5 1 0xf4532323 -- send 0xf4532323 on ARINC channel 5\n");
+			printf("w 5 3 0xf4532323 0xf4532323 0xf4532323 -- send 3 words on ARINC channel 5\n");
+			printf("a 5 3 0xf4532323 0xf4532323 0xf4532323 -- receive 3 words from ARINC channel 5\n");
 			printf("q   -- quit\n");
 			printf("h   -- help\n");
 			scanf("%c", &command);//discard the character so we don't get >> (I don't like this)
@@ -53,7 +58,7 @@ void repl(FACE_INTERFACE_HANDLE_TYPE handles[], FACE_CONFIG_DATA_TYPE config[])
 			return;
 		if(command == '\n')
 			continue;
-		if(command != 's' && command != 'c' && command != 'r')
+		if(command != 's' && command != 'c' && command != 'r' && command != 'a' && command != 'w' )
 		{
 			while(command != '\n')
 				scanf("%c", &command);
@@ -65,7 +70,7 @@ void repl(FACE_INTERFACE_HANDLE_TYPE handles[], FACE_CONFIG_DATA_TYPE config[])
 		{
 			FACE_RETURN_CODE_TYPE result = FACE_NO_ERROR;
 			printf("set channel %d: ", channel);
-			int handleid = gethandle(config, channel);
+			int handleid = gethandle(config, channel, FACE_DISCRETE);
 			if(handleid > 0 && config[handleid].direction != FACE_TRANSMIT)
 				printf("channel not transmit capable!%s\n", FAILMESSAGE);
 			else if(handleid < 0)
@@ -80,7 +85,7 @@ void repl(FACE_INTERFACE_HANDLE_TYPE handles[], FACE_CONFIG_DATA_TYPE config[])
 		{
 			FACE_RETURN_CODE_TYPE result = FACE_NO_ERROR;
 			printf("clear channel %d: ", channel);
-			int handleid = gethandle(config, channel);
+			int handleid = gethandle(config, channel, FACE_DISCRETE);
 			if(handleid > 0 && config[handleid].direction != FACE_TRANSMIT)
 				printf("channel not transmit capable!%s\n", FAILMESSAGE);
 			else if(handleid < 0)
@@ -91,12 +96,63 @@ void repl(FACE_INTERFACE_HANDLE_TYPE handles[], FACE_CONFIG_DATA_TYPE config[])
 				printf(result != FACE_NO_ERROR?FAILMESSAGE:GOODMESSAGE);
 			}
 		}
+		if(command == 'w')
+		{
+			uint32_t numwords;
+			scanf("%u", &numwords);
+			int handleid = gethandle(config, channel, FACE_ARINC_429);
+			if(handleid < 0 )
+				;//printf("Invalid channel!\n");
+			else if(numwords > MAX_ARINC_LABELS_PER_MESSAGE)
+			{
+				uint32_t dummy;
+				int i;
+				printf("Too many words (max is %d)\n", MAX_ARINC_LABELS_PER_MESSAGE);
+				for(i = 0; i < numwords; i ++)
+					scanf("%x", &dummy);
+			}
+			else
+			{
+				FACE_RETURN_CODE_TYPE result = FACE_NO_ERROR;
+				uint32_t arincwords[MAX_ARINC_LABELS_PER_MESSAGE+1];
+				int i;
+				for(i = 0; i < numwords; i ++)
+					scanf("%x", &arincwords[i]);
+				sendArinc429(handles[handleid], (uint8_t)channel, arincwords, numwords, &result);
+				printf("%d\n", result);
+				printf(result != FACE_NO_ERROR?FAILMESSAGE:GOODMESSAGE);
+			}
+		}
+		if(command == 'a')
+		{
+			uint32_t numwords;
+			scanf("%u", &numwords);
+			int handleid = gethandle(config, channel, FACE_ARINC_429);
+			if(handleid < 0 )
+				;//printf("Invalid channel!\n");
+			else if(numwords > MAX_ARINC_LABELS_PER_MESSAGE)
+			{
+				printf("Too many words (max is %d)\n", MAX_ARINC_LABELS_PER_MESSAGE);
+			}
+			else
+			{
+				FACE_RETURN_CODE_TYPE result = FACE_NO_ERROR;
+				uint32_t arincwords[MAX_ARINC_LABELS_PER_MESSAGE+1];
+				int i;
+				uint8_t channeldummy;
+				readArinc429(handles[handleid], &channeldummy, arincwords, &numwords, &result);
+				for(i = 0; i < numwords && result == FACE_NO_ERROR; i ++)
+					printf(" 0x%x ", arincwords[i]);
+				printf(result != FACE_NO_ERROR?FAILMESSAGE:GOODMESSAGE);
+				printf("%d", result);
+			}
+		}
 		if(command == 'r')
 		{
 			FACE_RETURN_CODE_TYPE result = FACE_NO_ERROR;
 			int value = -1;
 			printf("read channel %d:", channel);
-			int handleid = gethandle(config, channel);
+			int handleid = gethandle(config, channel, FACE_DISCRETE);
 			if(handleid > 0 && config[handleid].direction != FACE_RECEIVE)
 				printf("channel not receive capable!%s\n", FAILMESSAGE);
 			else if(handleid < 0)
