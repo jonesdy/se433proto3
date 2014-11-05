@@ -12,7 +12,7 @@
 
 #define MAX_ARINC_LABELS_PER_MESSAGE 10
 
-static int gethandle(FACE_CONFIG_DATA_TYPE config[], int channel, int/*XXX*/ bustype)
+static int getHandleIndex(FACE_CONFIG_DATA_TYPE config[], int channel, int/*XXX*/ bustype)
 {
    int i;
    for(i = 0; i < MAX_CONNECTIONS; i++)
@@ -70,7 +70,7 @@ void repl(FACE_INTERFACE_HANDLE_TYPE handles[], FACE_CONFIG_DATA_TYPE config[])
 		{
 			FACE_RETURN_CODE_TYPE result = FACE_NO_ERROR;
 			printf("set channel %d: ", channel);
-			int handleid = gethandle(config, channel, FACE_DISCRETE);
+			int handleid = getHandleIndex(config, channel, FACE_DISCRETE);
 			if(handleid > 0 && config[handleid].direction != FACE_TRANSMIT)
 				printf("channel not transmit capable!%s\n", FAILMESSAGE);
 			else if(handleid < 0)
@@ -85,7 +85,7 @@ void repl(FACE_INTERFACE_HANDLE_TYPE handles[], FACE_CONFIG_DATA_TYPE config[])
 		{
 			FACE_RETURN_CODE_TYPE result = FACE_NO_ERROR;
 			printf("clear channel %d: ", channel);
-			int handleid = gethandle(config, channel, FACE_DISCRETE);
+			int handleid = getHandleIndex(config, channel, FACE_DISCRETE);
 			if(handleid > 0 && config[handleid].direction != FACE_TRANSMIT)
 				printf("channel not transmit capable!%s\n", FAILMESSAGE);
 			else if(handleid < 0)
@@ -100,7 +100,7 @@ void repl(FACE_INTERFACE_HANDLE_TYPE handles[], FACE_CONFIG_DATA_TYPE config[])
 		{
 			uint32_t numwords;
 			scanf("%u", &numwords);
-			int handleid = gethandle(config, channel, FACE_ARINC_429);
+			int handleid = getHandleIndex(config, channel, FACE_ARINC_429);
 			if(handleid < 0 )
 				;//printf("Invalid channel!\n");
 			else if(numwords > MAX_ARINC_LABELS_PER_MESSAGE)
@@ -127,7 +127,7 @@ void repl(FACE_INTERFACE_HANDLE_TYPE handles[], FACE_CONFIG_DATA_TYPE config[])
 		{
 			uint32_t numwords;
 			scanf("%u", &numwords);
-			int handleid = gethandle(config, channel, FACE_ARINC_429);
+			int handleid = getHandleIndex(config, channel, FACE_ARINC_429);
 			if(handleid < 0 )
 				;//printf("Invalid channel!\n");
 			else if(numwords > MAX_ARINC_LABELS_PER_MESSAGE)
@@ -152,7 +152,7 @@ void repl(FACE_INTERFACE_HANDLE_TYPE handles[], FACE_CONFIG_DATA_TYPE config[])
 			FACE_RETURN_CODE_TYPE result = FACE_NO_ERROR;
 			int value = -1;
 			printf("read channel %d:", channel);
-			int handleid = gethandle(config, channel, FACE_DISCRETE);
+			int handleid = getHandleIndex(config, channel, FACE_DISCRETE);
 			if(handleid > 0 && config[handleid].direction != FACE_RECEIVE)
 				printf("channel not receive capable!%s\n", FAILMESSAGE);
 			else if(handleid < 0)
