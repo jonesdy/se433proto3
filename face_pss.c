@@ -166,7 +166,8 @@ void sendArinc429(FACE_INTERFACE_HANDLE_TYPE handle, uint8_t channel, uint32_t *
 }
 
 // Uses numLabels as max number of labels, and then uses it to return how many labels were actually read
-void readArinc429(FACE_INTERFACE_HANDLE_TYPE handle, uint8_t channel, uint32_t *data, uint32_t *numLabels,
+// Also returns the channel, but no input is required
+void readArinc429(FACE_INTERFACE_HANDLE_TYPE handle, uint8_t *channel, uint32_t *data, uint32_t *numLabels,
    FACE_RETURN_CODE_TYPE *retCode)
 {
    // TODO: We don't need channel number?
@@ -190,6 +191,7 @@ void readArinc429(FACE_INTERFACE_HANDLE_TYPE handle, uint8_t channel, uint32_t *
    // Return the data
    FACE_A429_MESSAGE_TYPE *rxData = (FACE_A429_MESSAGE_TYPE*)rxFaceMsg->data;
    *numLabels = rxData->num_labels;
+   *channel = rxData->channel;
    uint32_t i;
    for(i = 0; i < *numLabels; i++)
    {
