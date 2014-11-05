@@ -35,7 +35,7 @@ _Bool PasrseConfigFile( /* in */ const char * filename, /*out */ FACE_CONFIG_DAT
    infile = fopen(filename,"r");
    if (infile == 0) 
    {
-      printf("XML Error: Cannot open input file '%s'.\n", infile); 
+      printf("XML Error: Cannot open input file '%s'.\n", filename); 
       return false;
    }
 
