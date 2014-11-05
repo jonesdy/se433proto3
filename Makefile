@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -c -fpic
+CFLAGS=-Wall -c -fpic -ggdb
 LIBFLAGS=-shared -o
 LIBRARY=face_io_lib
 EXECUTABLE=face_pss.out
