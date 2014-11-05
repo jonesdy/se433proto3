@@ -45,18 +45,15 @@ int main(int argc, char *argv[])
    int i = 0;
    for(i = 0; i < MAX_CONNECTIONS; i++)
    {
-      if(config[i].channel != 0 && config[i].busType == FACE_DISCRETE)
+      FACE_IO_Open(config[i].name, &handles[i], &retCode);
+      if(retCode != FACE_NO_ERROR)
       {
-         FACE_IO_Open(config[i].name, &handles[i], &retCode);
-         if(retCode != FACE_NO_ERROR)
-         {
-            printf("Error occurred while opening %s: %d\n", config[i].name,
-               retCode);
-         }
-         else
-         {
-            printf("Successfully opened channel %d: %s\n", config[i].channel, config[i].name);
-         }
+         printf("Error occurred while opening %s: %d\n", config[i].name,
+            retCode);
+      }
+      else
+      {
+         printf("Successfully opened channel %d: %s\n", config[i].channel, config[i].name);
       }
    }
 
@@ -65,18 +62,15 @@ int main(int argc, char *argv[])
    // Close channels
    for(i = 0; i < MAX_CONNECTIONS; i++)
    {
-      if(config[i].channel != 0 && config[i].busType == FACE_DISCRETE)
+      FACE_IO_Close(handles[i], &retCode);
+      if(retCode != FACE_NO_ERROR )
       {
-         FACE_IO_Close(handles[i], &retCode);
-         if(retCode != FACE_NO_ERROR )
-         {
-            printf("Error occurred while closing %s: %d\n", config[i].name,
-               retCode);
-         }
-         else
-         {
-            printf("Successfully closed %s\n", config[i].name);
-         }
+         printf("Error occurred while closing %s: %d\n", config[i].name,
+            retCode);
+      }
+      else
+      {
+         printf("Successfully closed %s\n", config[i].name);
       }
    }
 
@@ -170,7 +164,6 @@ void sendArinc429(FACE_INTERFACE_HANDLE_TYPE handle, uint8_t channel, uint32_t *
 void readArinc429(FACE_INTERFACE_HANDLE_TYPE handle, uint8_t *channel, uint32_t *data, uint32_t *numLabels,
    FACE_RETURN_CODE_TYPE *retCode)
 {
-   // TODO: We don't need channel number?
    // The message and stuff we will need
    char rxBuff[MAX_BUFF_SIZE];
    FACE_IO_MESSAGE_TYPE *rxFaceMsg = (FACE_IO_MESSAGE_TYPE*)rxBuff;
