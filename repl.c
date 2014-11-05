@@ -63,7 +63,7 @@ void repl(FACE_INTERFACE_HANDLE_TYPE handles[], FACE_CONFIG_DATA_TYPE config[])
 		//test if channel is available here?
 		if(command == 's')
 		{
-			FACE_RETURN_CODE_TYPE result;
+			FACE_RETURN_CODE_TYPE result = FACE_NO_ERROR;
 			printf("set channel %d: ", channel);
 			int handleid = gethandle(config, channel);
 			if(handleid > 0 && config[handleid].direction != FACE_TRANSMIT)
@@ -78,7 +78,7 @@ void repl(FACE_INTERFACE_HANDLE_TYPE handles[], FACE_CONFIG_DATA_TYPE config[])
 		}
 		if(command == 'c')
 		{
-			FACE_RETURN_CODE_TYPE result;
+			FACE_RETURN_CODE_TYPE result = FACE_NO_ERROR;
 			printf("clear channel %d: ", channel);
 			int handleid = gethandle(config, channel);
 			if(handleid > 0 && config[handleid].direction != FACE_TRANSMIT)
@@ -93,7 +93,7 @@ void repl(FACE_INTERFACE_HANDLE_TYPE handles[], FACE_CONFIG_DATA_TYPE config[])
 		}
 		if(command == 'r')
 		{
-			FACE_RETURN_CODE_TYPE result;
+			FACE_RETURN_CODE_TYPE result = FACE_NO_ERROR;
 			int value = -1;
 			printf("read channel %d:", channel);
 			int handleid = gethandle(config, channel);
