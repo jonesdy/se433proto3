@@ -1,3 +1,4 @@
+#include <string.h>
 #include <stdio.h>
 #include "face_pss.h"
 #include "config_parser.h"
@@ -172,3 +173,37 @@ void repl(FACE_INTERFACE_HANDLE_TYPE handles[], FACE_CONFIG_DATA_TYPE config[])
 #ifdef TESTREPL
 int main(){repl(NULL);}
 #endif
+
+#define MAX_LABELS 1024
+
+void *readConnection(void *handlePtr)
+{
+   FACE_INTERFACE_HANDLE_TYPE handle = *(FACE_INTERFACE_HANDLE_TYPE*)handlePtr;
+   uint8_t channel = 0;
+   uint32_t data[MAX_LABELS];
+   uint32_t labels = MAX_LABELS;
+   FACE_RETURN_CODE_TYPE retCode;
+   
+   printf("Started read thread.\n");
+
+   while(1)
+   {
+      // This probably doesn't have to be done each time
+      memset(data, 0, MAX_LABELS);
+
+      readArinc429(handle, &channel, data, &labels, &retCode);
+
+      if(retCode == FACE_NO_ERROR)
+      {
+         // Got some data, now print it out
+         uint32_t i;
+         printf("Got the following labels for channel %u:\n", channel);
+         for(i = 0; i < labels; i++)
+         {
+            printf("0x%X\n", data[i]);
+         }
+      }
+   }
+   
+   return NULL;
+}

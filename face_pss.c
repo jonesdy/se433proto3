@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <pthread.h>
 
 #define MAX_BUFF_SIZE 1024
 #define PAYLOAD_LENGTH 4
@@ -42,10 +43,19 @@ int main(int argc, char *argv[])
 
    // Open channels from config and store handles
    FACE_INTERFACE_HANDLE_TYPE handles[MAX_CONNECTIONS];
+   pthread_t threads[MAX_CONNECTIONS];
    uint32_t i = 0;
    for(i = 0; i < numConnections; i++)
    {
       FACE_IO_Open(config[i].name, &handles[i], &retCode);
+      if(config[i].connectionType == FACE_UDP_CONNECTION && config[i].direction == FACE_RECEIVE)
+      {
+         // Need to create a new thread to continuously read packets
+         if(pthread_create(&threads[i], NULL, &readConnection, (void*)&handles[i]))
+         {
+            printf("Error creating thread.\n");
+         }
+      }
       if(retCode != FACE_NO_ERROR)
       {
          printf("Error occurred while opening %s: %d\n", config[i].name,
@@ -62,6 +72,13 @@ int main(int argc, char *argv[])
    // Close channels
    for(i = 0; i < numConnections; i++)
    {
+      if(config[i].connectionType == FACE_UDP_CONNECTION && config[i].direction == FACE_RECEIVE)
+      {
+         if(pthread_cancel(threads[i]))
+         {
+            printf("Error occurred while cancelling thread.\n");
+         }
+      }
       FACE_IO_Close(handles[i], &retCode);
       if(retCode != FACE_NO_ERROR )
       {

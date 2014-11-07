@@ -7,7 +7,7 @@ EXECUTABLE=face_pss.out
 all:lib exe
 
 exe:face_pss.o repl.o
-	LD_PATH=. $(CC) -o $(EXECUTABLE) $^ -Wl,-rpath,. lib$(LIBRARY).so
+	LD_PATH=. $(CC) -lpthread -o $(EXECUTABLE) $^ -Wl,-rpath,. lib$(LIBRARY).so
 
 lib:face_io_api.o config_parser.o
 	$(CC) $(LIBFLAGS) lib$(LIBRARY).so $^
