@@ -27,6 +27,30 @@ static int getHandleIndex(FACE_CONFIG_DATA_TYPE config[], int channel, int/*XXX*
    return -1;
 }
 
+int readrunning = 1;
+void readloop(const FACE_INTERFACE_HANDLE_TYPE handle, FACE_CONFIG_DATA_TYPE *config,  uint32_t numwords)
+{
+	while(readrunning)
+	{
+		FACE_RETURN_CODE_TYPE result = FACE_NO_ERROR;
+		uint32_t arincwords[MAX_ARINC_LABELS_PER_MESSAGE+1];
+		int i;
+		uint8_t channeldummy;
+		readArinc429(handle, &channeldummy, arincwords, &numwords, &result);
+		if(result != FACE_NO_ERROR)
+			continue;//error is probably a timeout, so just try again
+		printf("%c7%cM %c[2K", 0x1b, 0x1b, 0x1b);//move the cursor one line up and delete the current contents
+		printf("received on ARINC channel %d: ", config->channel);
+		for(i = 0; i < numwords && result == FACE_NO_ERROR; i ++)
+			printf(" 0x%x ", arincwords[i]);
+		printf("%c8", 0x1b);//return the cursor to where it was
+		printf(result != FACE_NO_ERROR?FAILMESSAGE:GOODMESSAGE);
+	
+	}
+
+}
+
+
 void repl(FACE_INTERFACE_HANDLE_TYPE handles[], FACE_CONFIG_DATA_TYPE config[])
 {
 	printf("h for help\n");
@@ -35,6 +59,7 @@ void repl(FACE_INTERFACE_HANDLE_TYPE handles[], FACE_CONFIG_DATA_TYPE config[])
 		
 		char command;
 		int channel = -1;
+		printf("No current message...\n");//allocate space for the other thread to come and mess it all up
 		printf(">");
 		if(scanf("%c", &command) == EOF)
 		{
@@ -49,7 +74,7 @@ void repl(FACE_INTERFACE_HANDLE_TYPE handles[], FACE_CONFIG_DATA_TYPE config[])
 			printf("r 5 -- read discrete 5\n");
 			printf("w 5 1 0xf4532323 -- send 0xf4532323 on ARINC channel 5\n");
 			printf("w 5 3 0xf4532323 0xf4532323 0xf4532323 -- send 3 words on ARINC channel 5\n");
-			printf("a 5 3 0xf4532323 0xf4532323 0xf4532323 -- receive 3 words from ARINC channel 5\n");
+			printf("a 5 3 -- receive 3 words from ARINC channel 5\n");
 			printf("q   -- quit\n");
 			printf("h   -- help\n");
 			scanf("%c", &command);//discard the character so we don't get >> (I don't like this)
