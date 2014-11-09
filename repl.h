@@ -6,6 +6,6 @@
 
 void repl(FACE_INTERFACE_HANDLE_TYPE handles[], FACE_CONFIG_DATA_TYPE config[]);
 
-void *readConnection(void *handlePtr);
+void *readArincConnection(void *handlePtr);
 
 #endif

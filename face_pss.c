@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
       if(config[i].connectionType == FACE_UDP_CONNECTION && config[i].direction == FACE_RECEIVE)
       {
          // Need to create a new thread to continuously read packets
-         if(pthread_create(&threads[i], NULL, &readConnection, (void*)&handles[i]))
+         if(pthread_create(&threads[i], NULL, &readArincConnection, (void*)&handles[i]))
          {
             printf("Error creating thread.\n");
          }
