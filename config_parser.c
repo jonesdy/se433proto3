@@ -24,7 +24,7 @@ static void StoreByte(const char * src, uint8_t * dest);
 // The user must pass a pointer to an array of CONNECTION_INFO_TYPE and maximum number of elements in the array.
 // The function passes back the connection data in the array and the number of connections.
 // It returns true on success, false on failure.
-_Bool PasrseConfigFile( /* in */ const char * filename, /*out */ FACE_CONFIG_DATA_TYPE config[], /*in out */ uint32_t * numConnections)
+_Bool ParseConfigFile( /* in */ const char * filename, /*out */ FACE_CONFIG_DATA_TYPE config[], /*in out */ uint32_t * numConnections)
 {
    char line[MAX_LINE_LEN];
    int index;

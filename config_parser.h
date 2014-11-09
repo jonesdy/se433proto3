@@ -68,7 +68,7 @@ typedef struct
 //     CONNECTION_INFO_TYPE configData[20];
 //     int numConnections = 20;
 //     PasrseConfigFile("config.xml", configData, &numConnections);
-_Bool PasrseConfigFile( /* in */ const char * filename, /*out */ FACE_CONFIG_DATA_TYPE config[], /*in out */ uint32_t * numConnections);
+_Bool ParseConfigFile( /* in */ const char * filename, /*out */ FACE_CONFIG_DATA_TYPE config[], /*in out */ uint32_t * numConnections);
 
 
 #endif

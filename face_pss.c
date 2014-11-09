@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
    uint32_t numConnections = MAX_CONNECTIONS;
    FACE_CONFIG_DATA_TYPE config[MAX_CONNECTIONS];
 
-   PasrseConfigFile(argv[1], config, &numConnections);
+   ParseConfigFile(argv[1], config, &numConnections);
 
    // Open channels from config and store handles
    FACE_INTERFACE_HANDLE_TYPE handles[MAX_CONNECTIONS];
