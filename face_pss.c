@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
    return 0;
 }
 
-void setDiscrete(FACE_INTERFACE_HANDLE_TYPE handle, int channel,
+void setDiscrete(FACE_INTERFACE_HANDLE_TYPE handle, uint8_t channel,
    uint8_t value, FACE_RETURN_CODE_TYPE *retCode)
 {
    // The message and stuff we will need
@@ -119,7 +119,7 @@ void setDiscrete(FACE_INTERFACE_HANDLE_TYPE handle, int channel,
       txFaceMsg, retCode);
 }
 
-uint8_t readDiscrete(FACE_INTERFACE_HANDLE_TYPE handle, int channel,
+uint8_t readDiscrete(FACE_INTERFACE_HANDLE_TYPE handle, uint8_t channel,
    FACE_RETURN_CODE_TYPE *retCode)
 {
    // The message and stuff we will need
